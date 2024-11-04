@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+    <h1 id="disp" style="text-align: center;">Welcome</h1>
+    <script type="module">
+          import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgmVKAhKlHXTwliCuiQaY1840gjlS7MK0",
+      authDomain: "emailpw-5f0ab.firebaseapp.com",
+      projectId: "emailpw-5f0ab",
+      storageBucket: "emailpw-5f0ab.appspot.com",
+      messagingSenderId: "645836965783",
+      appId: "1:645836965783:web:77727fc13a58b29331a6d2"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // User is signed in, see docs for a list of available properties
+    // https://firebase.google.com/docs/reference/js/firebase.User
+    const uid = user.uid;
+    console.log(user)
+    disp.innerHTML = user.email
+    // ...
+  } else {
+    // User is signed out
+    // ...
+  }
+});
+    </script>
+</body>
+</html>

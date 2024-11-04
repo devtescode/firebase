@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="B.A SignUp.css">
+    <title>B.A SignUp</title>
+</head>
+
+<body>
+    <section>
+        <div class="Create-Container">
+            <div class="inpuut">
+                <h2>Create An Account</h2>
+                <input type="text" placeholder="Full Name" id="fn">
+                <input type="email" placeholder="Email address" id="em">
+                <input type="password" placeholder="Password" id="pw">
+                <input type="password" placeholder="Repeat Password" id="repw">
+            </div>
+            <input id="checkBox" type="checkbox"> By signing up you agree to our terms & <code>conditions</code> and
+            <code>privacy policy</code><br>
+            <button onclick="createAccount()">Sign Up</button>
+            <p>Already have an account? <a href="B.A SignIn.html">Sign in</a></p>
+        </div>
+    </section>
+    <script>
+        let allUsers = []
+        if (localStorage.bankUsers) {
+            let oldData = JSON.parse(localStorage.getItem("bankUsers"))
+            allUsers = oldData
+        }
+        const createAccount = () => {
+            let userDetails = {
+                Fullname: fn.value,
+                Email: em.value,
+                Password: pw.value,
+                Repassword: repw.value
+            }
+            if (pw.value != repw.value) {
+                alert("Password Does not Match")
+            } else if (fn.value == "" || em.value == "" || pw.value == "" || repw.value == "") {
+                alert("Pls Fill Form to Create Account")
+            } else if (checkBox.checked == false) {
+                alert("Agree to our terms and condition")
+            }
+            else {
+                allUsers.push(userDetails)
+                localStorage.setItem("bankUsers", JSON.stringify(allUsers))
+                window.location.href = "B.A SignIn.html"
+                fn.value=""
+                em.value=""
+                pw.value=""
+                repw.value=""
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+  <title>Uploaded Songs</title>
+</head>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital@1&family=Oswald&display=swap');
+  body{
+    background: url("https://img.freepik.com/free-vector/social-media-illustration_24877-52395.jpg?w=740&t=st=1676819188~exp=1676819788~hmac=7bd5f7c463a5b1e201a14dc6ef7d89b57d02b50088977b900d2d06a98f3b5580") no-repeat center;
+    background-size: cover;
+    min-height: 100vh;
+    font-family: 'Crimson Text', serif;
+    font-family: 'Oswald', sans-serif;
+  }
+  tr {
+    font-size: 13px !important;
+  }
+
+  #loadingImgg {
+    width: 100% !important;
+    height: 80vh !important;
+  }
+</style>
+
+<body onload="loadImg()">
+  <div id="loading"></div>
+  <table id="myTable" class="table table-striped table-primary table-bordered border-info text-center table-hover">
+  </table>
+
+  <!-- <table id="myTable2" class="table table-striped table-dark ">
+  </table> -->
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+    import { getStorage, ref as stRef, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-storage.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC98YEP_HcyALbbfMPoteM2vh2zaXh-Cn8",
+      authDomain: "audiomack-5d1ef.firebaseapp.com",
+      databaseURL: "https://audiomack-5d1ef-default-rtdb.firebaseio.com",
+      projectId: "audiomack-5d1ef",
+      storageBucket: "audiomack-5d1ef.appspot.com",
+      messagingSenderId: "983584334472",
+      appId: "1:983584334472:web:fc6b8b1f6a74f5ab8cf53d"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase();
+    const storage = getStorage();
+    const auth = getAuth();
+    let allSongs = []
+    //Retrieving from database
+
+
+    function loadImg() {
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          loading.innerHTML = `<img src="https://www.avantech.com.mt/wp-content/themes/Avantech_2020/images/loader_540.gif" id="loadingImgg" />`
+          setTimeout(() => {
+            loading.innerHTML = ""
+          }, 1000);
+
+          //Retrieving Data from database
+          onValue(ref(db, 'audioStore'), (snapshot) => {
+            allSongs = snapshot.val()
+            myTable.innerHTML = ""
+            // myTable2.innerHTML = ""
+            myTable.innerHTML = `
+              <tr>
+                <th>S/N</th>
+                <th>Song Name</th>
+                <th>Artist</th>
+                <th>Genre</th>
+                <th>Song</th>
+              </tr>
+              `
+            // myTable2.innerHTML = `
+            //     <tr>
+            //       <th>S/N</th>
+            //       <th>Cover Image</th>
+            //     </tr>
+            //     `
+            allSongs.map((eachSong, index) => {
+              console.log(eachSong)
+              let audioRef = stRef(storage, `store/${eachSong.audioName}`);
+              // let imageRef = stRef(storage, `imgStore/${eachSong.imgName}`);
+              getDownloadURL(audioRef)
+                .then((url) => {
+                  // console.log(url)
+                  myTable.innerHTML += `
+                      <tr>
+                      <td>${index + 1}</td>
+                      <td>${eachSong.songName}</td>
+                      <td>${eachSong.artistName}</td>
+                      <td>${eachSong.songCategory}</td>
+                      <td><audio src="${url}" controls style="width: 180px;height: 40px;"></audio></td>
+                    </tr>               
+                      `
+
+                })
+              // getDownloadURL(imageRef)
+              //   .then((url) => {
+              //     // console.log(url)
+              //         myTable2.innerHTML += `
+              //             <tr>
+              //         <td>${index + 1}</td>
+              //         <td><img src="${url}" width="100px" height="100px"/></td>
+              //         </tr>
+                    
+              //             `
+              //       })
+                });
+
+
+
+          })
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'User Account Not Found',
+            text: 'You need to Sign In First',
+            confirmButtonColor: '#0d6efd',
+
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href = "signInPage.html"
+            }
+          })
+
+        }
+      });
+
+
+
+    }
+    window.loadImg = loadImg
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</body>
+
+</html>

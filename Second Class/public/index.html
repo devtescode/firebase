@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body style="text-align: center;">
+    <div style="background-color: green;">
+        <h1 style="color: white;">Welcome To Firebase Authentication</h1>
+    <button id="signin" style="background-color: yellow; color: white; border-radius: 15px;height: 40px;width: 120px;border: none;font-size: 20px;">Sign In</button>
+    <div style="display: none;" id="profile">
+      <img src="" id="profileimg" alt="" style="height: 60px; border-radius: 50%;" width="60px">
+      <span id="name"></span>
+      <span id="email"></span>
+    </div>
+    </div>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-auth.js";
+
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyCASVr_oCkhF38Wf8WiE6Qj_Vr-YHP7JDs",
+          authDomain: "authentication-test-a46bf.firebaseapp.com",
+          projectId: "authentication-test-a46bf",
+          storageBucket: "authentication-test-a46bf.appspot.com",
+          messagingSenderId: "405187325063",
+          appId: "1:405187325063:web:d939e379968e4c6fb55c22"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const provider = new GoogleAuthProvider();
+        document.getElementById("signin").addEventListener('click',()=>{
+
+const auth = getAuth();
+signInWithPopup(auth, provider)
+  .then((result) => {
+    // This gives you a Google Access Token. You can use it to access the Google API.
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    const token = credential.accessToken;
+    // The signed-in user info.
+    const user = result.user;
+    console.log(user)
+    signin.style.display = "none";
+    profile.style.display = "block";
+    profileimg.src = user.photoURL;
+    name.innerHTML = user.displayName;
+    email.innerHTML = user.email
+
+    // ...
+  }).catch((error) => {
+    // Handle Errors here.
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    // The email of the user's account used.
+    const email = error.customData.email;
+    // The AuthCredential type that was used.
+    const credential = GoogleAuthProvider.credentialFromError(error);
+    // ...
+  });
+        })
+      </script>
+</body>
+</html>

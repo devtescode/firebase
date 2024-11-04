@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="displayBtn"><button id="signUp">Login</button></div>
+    <div id="displayUser">
+        <h2>Name: <span id="userName"></span></h2>
+        <h2>Email: <span id="userEmail"></span></h2>
+        <h2>Image: <span><img src="" alt="" srcset="" id="userPhoto"></span></h2>
+        <!-- <h2>Verified Email: <span id="userVmail"></span></h2> -->
+    </div>
+    <script type="module">
+        displayUser.style.display = "none"
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDFWl_5_hkYWR0N9tWVjvL8xc_2pIgTwjo",
+            authDomain: "signup-fce65.firebaseapp.com",
+            projectId: "signup-fce65",
+            storageBucket: "signup-fce65.appspot.com",
+            messagingSenderId: "405854017197",
+            appId: "1:405854017197:web:0ba88c74e2c6f60388d824"
+        };
+
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+        // const user = auth.currentUser;
+        document.getElementById("signUp").addEventListener("click", () => {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    alert("User Found")
+                    // User is signed in, see docs for a list of available properties
+                    // https://firebase.google.com/docs/reference/js/firebase.User
+                    const uid = user.uid;
+                    displayUser.style.display = "block"
+                    const displayName = user.displayName;
+                    const email = user.email;
+                    const photoURL = user.photoURL;
+                    const emailVerified = user.emailVerified;
+                    displayBtn.style.display = "none"
+                    userName.innerHTML = displayName
+                    userEmail.innerHTML = email
+                    userPhoto.src = photoURL
+                    // userVmail.innerHTML = emailVerified
+                    // ...
+                } else {
+                    // User is signed out
+                    // ...
+                    alert("User not Found")
+                }
+            });
+        })
+        
+    </script>
+</body>
+
+</html>

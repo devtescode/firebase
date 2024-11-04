@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="B.A SignIn.css">
+    <title>B.A SignIn</title>
+</head>
+
+<body>
+    <section>
+        <h2>Sign In to Continue</h2>
+        <input type="email" placeholder="Email address" id="em">
+        <input type="password" placeholder="Password" id="pw"><br>
+        <button onclick="signIn()">Sign In</button>
+        <p>Don't have an account? <a href="index.html">Sign Up</a></p>
+    </section>
+    <script>
+        let allUsers = JSON.parse(localStorage.getItem("bankUsers"))
+        let found = false
+        const signIn = () => {
+            allUsers.map((userlogin, index) => {
+                if (userlogin.Email == em.value && userlogin.Password == pw.value) {
+                    localStorage.setItem("newUsers", index)
+                    found = true
+                }
+            })
+
+            if (found == true) {
+                em.value=""
+                ep.value=""
+                window.location.href = "B.A Welcome.html"
+
+            } else {
+                alert("Invalid Details")
+            }
+        }
+    </script>
+</body>
+
+</html>

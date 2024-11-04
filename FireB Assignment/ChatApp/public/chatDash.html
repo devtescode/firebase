@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <title>Chat APP</title>
+</head>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Sriracha&display=swap');
+    body {
+        background-image: url("https://img.freepik.com/premium-photo/silver-clouds-noctilucent-clouds-are-bright-cloudlike-atmospheric-phenomena-visible-deep-twilight-they-are-highest-clouds-earth-s-atmosphere_255424-3758.jpg?w=740");
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        min-height: 100vh;
+        font-family: 'Sriracha', cursive;
+    }
+    .sticky-bottom { 
+        bottom: 0.5em; 
+        }
+</style>
+
+<body>
+    <div class="col-11 col-md-6 shadow m-auto mt-2 p-4 bg-white rounded">
+        <div id="displayUserDetails"></div>
+        <button id="signOutBtn" class="btn btn-warning mt-3">Sign Out</button>
+    </div>
+    <h3 class="text-center text-white mt-2">Chats</h3>
+    <div class="col-10 col-md-6 m-auto mt-3">
+        <b id="displayMessage" class="text-white"></b>
+        <div class="input-group sticky-bottom">
+            <input type="text" class="form-control" id="messages">
+            <button class="btn btn-primary" type="button" id="sendBtn"><i class="bi bi-send"></i></button>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCS734ibAi9GBJEC14gwsRC9rzPXHOIBSo",
+            authDomain: "chatapp-d5b64.firebaseapp.com",
+            databaseURL: "https://chatapp-d5b64-default-rtdb.firebaseio.com",
+            projectId: "chatapp-d5b64",
+            storageBucket: "chatapp-d5b64.appspot.com",
+            messagingSenderId: "526548782919",
+            appId: "1:526548782919:web:6d7cb06435244414348662"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+        const db = getDatabase();
+        let array = []
+        let userIndex = 0
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in, see docs for a list of available properties
+                // https://firebase.google.com/docs/reference/js/firebase.User
+                // const uid = user.uid;
+                // console.log(user)
+                displayUserDetails.innerHTML = `
+        <h5 style="font-size: 22px;"> <span><b><h4>Name:</h4></b> ${user.displayName} <img src="${user.photoURL}" style="border-radius: 50% !important; height: 38px !important;"/></span> </h5>     
+       <h5 style="font-size: 22px;" class="pt-3"> <span><b><h4>Email:</h4></b> ${user.email}</span></h5>
+                `
+                // ...
+            } else {
+                // User is signed out
+                // ...
+                window.location.href = "index.html"
+            }
+        });
+        signOutBtn.addEventListener("click", () => {
+            signOut(auth).then(() => {
+                // Sign-out successful.
+                alert("Log Out Successful")
+            }).catch((error) => {
+                // An error happened.
+                alert("An error happened")
+            });
+        })
+        sendBtn.addEventListener("click", () => {
+            // alert("working")
+            // console.log(auth.currentUser.photoURL)
+            let userImage = auth.currentUser.photoURL
+            let userMessage = {
+                message: messages.value,
+                userPhoto: userImage,
+            }
+            // array.push(userMessage)
+            // console.log(array)
+            messages.value = ""
+            // array.map((userMessage, index) => {
+            //         // console.log(userMessage.message)
+            //         displayMessage.innerHTML += `<p>${userMessage.message} <img src="${userMessage.userPhoto}"style="border-radius: 50% !important; height: 25px !important;"/> </p>`
+            //     })
+                set(ref(db, `usersChat/${userIndex}`), userMessage);
+                
+            
+            })
+
+            //FOR PC
+
+            messages.addEventListener("keydown",(event)=>{
+            console.log(event.keyCode)
+            if(event.keyCode==13){
+                        let userImage = auth.currentUser.photoURL
+            let userMessage = {
+                message: messages.value,
+                userPhoto: userImage,
+            }
+            // array.push(userMessage)
+            // console.log(array)
+            messages.value = ""
+            // array.map((userMessage, index) => {
+            //         // console.log(userMessage.message)
+            //         displayMessage.innerHTML += `<p>${userMessage.message} <img src="${userMessage.userPhoto}"style="border-radius: 50% !important; height: 25px !important;"/> </p>`
+            //     })
+            set(ref(db, `usersChat/${userIndex}`), userMessage);
+    
+            }
+        })
+
+            onValue(ref(db, 'usersChat'), (snapshot) => {
+                let userImage = auth.currentUser.photoURL
+                array = snapshot.val();
+                console.log(array)
+                displayMessage.innerHTML = ""
+            array.map((userMessage, index) => {
+                userIndex = array.length
+                displayMessage.innerHTML += `<p>${userMessage.message} <img src="${userMessage.userPhoto}"style="border-radius: 50% !important; height: 25px !important;"/> </p>
+                `
+    
+            })
+        });
+
+
+    </script>
+</body>
+
+</html>

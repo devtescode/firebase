@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<style>
+  button {
+    outline: 0;
+    border: 0;
+    padding: 10px 15px;
+    color: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 25px;
+    background-color: #005ce6;
+    border-radius: 6px;
+
+
+  }
+
+  button:hover {
+    background-color: #0066ff;
+    border-color: #10707f;
+    box-shadow: 0 0 0 2px rgba(0, 92, 230, .5);
+  }
+</style>
+
+<body style="text-align: center;">
+  <div>
+    <button id="logInWithTwitter">Log In With Twitter</button>
+  </div>
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+    import { getAuth, signInWithPopup, TwitterAuthProvider } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyB_4LIZKm0O3ePNKl-UeVpsCaV4oiQh-_g",
+      authDomain: "twittersign-a03b7.firebaseapp.com",
+      projectId: "twittersign-a03b7",
+      storageBucket: "twittersign-a03b7.appspot.com",
+      messagingSenderId: "551454893366",
+      appId: "1:551454893366:web:a25edf622e0e0f63f0bf97"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const provider = new TwitterAuthProvider();
+    document.getElementById("logInWithTwitter").addEventListener("click", () => {
+
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          // This gives you a the Twitter OAuth 1.0 Access Token and Secret.
+          // You can use these server side with your app's credentials to access the Twitter API.
+          const credential = TwitterAuthProvider.credentialFromResult(result);
+          const token = credential.accessToken;
+          const secret = credential.secret;
+
+          // The signed-in user info.
+          const user = result.user;
+          console.log(user)
+          alert("Sign In Successful")
+          // IdP data available using getAdditionalUserInfo(result)
+          // ...
+        }).catch((error) => {
+          // Handle Errors here.
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          // The email of the user's account used.
+          const email = error.customData.email;
+          // The AuthCredential type that was used.
+          const credential = TwitterAuthProvider.credentialFromError(error);
+          alert(errorMessage)
+          // ...
+        });
+    })
+  </script>
+</body>
+
+</html>

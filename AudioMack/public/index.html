@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+  <title>Upload Songs</title>
+</head>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital@1&family=Oswald&display=swap');
+
+  body {
+    background-image: url('https://img.freepik.com/premium-vector/illustration-vector-graphic-cartoon-character-download_516790-1067.jpg?w=740');
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: 100vh;
+    background-position: 800px;
+    font-family: 'Crimson Text', serif;
+    font-family: 'Oswald', sans-serif;
+  }
+
+  .colored-toast.swal2-icon-success {
+    background-color: #3fc3ee !important;
+  }
+
+  .colored-toast .swal2-title {
+    color: white;
+  }
+
+  @media only screen and (max-width: 688px) {
+    body {
+      background-position: 200px;
+    }
+  }
+
+  a:hover {
+    text-decoration: underline !important;
+  }
+</style>
+
+<body class="bg-light" onload="loadingg()">
+  <div class="col-12 col-md-7 m-auto p-2">
+    <h3 class="text-center text-primary">Upload Songs</h3>
+    <input type="text" placeholder="Name Of Song" class="form-control mb-2 mt-2 shadow" id="nameOfSong">
+    <input type="text" placeholder="Name Of Artist" class="form-control mb-2 shadow" id="nameOfArtist">
+    <!-- <input type="text" placeholder="Name Of Category"  id=""> -->
+    <select name="" id="songCategory" class="form-control mb-2 shadow">
+      <option value="Genre">Genre</option>
+      <option value="Rock">Rock</option>
+      <option value="Pop">Pop</option>
+      <option value="Dancehall">Dancehall</option>
+      <option value="Hip pop">Hip pop</option>
+      <option value="Inspirational">Inspirational</option>
+      <option value="R&B">R&B</option>
+      <option value="Others">Others</option>
+    </select>
+    <div class="m-auto col-11 col-md-8">
+      <!-- <label for="" class="ps-4 fw-bold text-primary">Upload Cover Image
+      </label> -->
+      <!-- <input type="file" accept="image/*" class="form-control shadow" id="coverImg"> -->
+
+      <label for="" class="ps-4  fw-bold text-primary">Upload Song
+      </label>
+      <input type="file" accept="audio/*" class="form-control shadow" id="songName">
+    </div>
+  </div>
+  <div class="text-center">
+    <button id="addSongBtn" class="btn btn-primary col-7 mt-1">Add Song</button>
+  </div>
+  <button class="btn btn-info mt-2"><em><a href="dashboard.html" style="text-decoration: none;"
+        class="fs-4 fw-bold text-white">View Uploaded Songs</a></em></button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+    import { getStorage, ref as stRef, uploadBytesResumable } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC98YEP_HcyALbbfMPoteM2vh2zaXh-Cn8",
+      authDomain: "audiomack-5d1ef.firebaseapp.com",
+      databaseURL: "https://audiomack-5d1ef-default-rtdb.firebaseio.com",
+      projectId: "audiomack-5d1ef",
+      storageBucket: "audiomack-5d1ef.appspot.com",
+      messagingSenderId: "983584334472",
+      appId: "1:983584334472:web:fc6b8b1f6a74f5ab8cf53d"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase();
+    const storage = getStorage();
+    const auth = getAuth();
+    let allSongs = []
+    let songIndex = 0
+    addSongBtn.addEventListener("click", () => {
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          console.log(user.email)
+
+          if (nameOfSong.value == "" || nameOfArtist.value == "" || songName.value == "") {
+            Swal.fire({
+              icon: 'error',
+              title: 'Invalid Song Upload',
+              text: 'Fill in all the required fields.',
+              confirmButtonColor: '#0d6efd',
+            })
+          } else if (songCategory.value == "Genre") {
+            Swal.fire({
+              icon: 'error',
+              title: 'Select Genre type',
+              confirmButtonColor: '#0d6efd',
+            })
+          } else {
+
+            //Set up information
+            // let imgFile = coverImg.files[0]
+            // let imgFileName = imgFile.name
+            let audioFile = songName.files[0]
+            let audioFileName = audioFile.name
+            let song = {
+              songName: nameOfSong.value,
+              artistName: nameOfArtist.value,
+              songCategory: songCategory.value,
+              // imgName: imgFileName,
+              audioName: audioFileName,
+              // userEmail: user.email
+            }
+            // console.log(song)
+            //Save to Database
+            set(ref(db, `audioStore/${songIndex}`), song);
+            //Upload File to Storage
+            // let imageRef = stRef(storage, `imgStore/${imgFileName}`);
+            let songRef = stRef(storage, `store/${audioFileName}`);
+            // uploadBytesResumable(imageRef, imgFile);
+            let uploadTask = uploadBytesResumable(songRef, audioFile);
+            uploadTask.on('state_changed',
+              async (snapshot) => {
+                // Observe state change events such as progress, pause, and resume
+                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+                console.log('Upload is ' + progress + '% done');
+                const Toast = Swal.mixin({
+                  toast: true,
+                  iconColor: 'white',
+                  customClass: {
+                    popup: 'colored-toast'
+                  },
+                  showConfirmButton: false,
+                  timer: 3000,
+                  timerProgressBar: true
+                })
+                await Toast.fire({
+                  icon: 'success',
+                  title: `Uploading...${progress}%`
+                })
+                switch (snapshot.state) {
+                  case 'paused':
+                    console.log('Upload is paused');
+                    break;
+                  case 'running':
+                    console.log('Uploading...');
+                    break;
+                }
+              },
+              (error) => {
+                // Handle unsuccessful uploads
+              },
+            );
+            nameOfSong.value = ""
+            nameOfArtist.value = ""
+            songCategory.value = ""
+            // coverImg.value = ""
+            songName.value = ""
+          }
+
+        }
+        //  else {
+        //   window.location.href = "signInPage.html"
+        // }
+      });
+
+    })
+    //Retrieving from database
+    onValue(ref(db, 'audioStore'), (snapshot) => {
+      console.log(snapshot.val())
+      allSongs = snapshot.val()
+      if (allSongs) {
+        songIndex = allSongs.length
+      } else {
+        songIndex = 0
+      }
+    });
+
+    function loadingg() {
+      onAuthStateChanged(auth, (user) => {
+        if (!user) {
+          Swal.fire({
+            icon: 'error',
+            title: 'User Account Not Found',
+            text: 'You need to Sign In First',
+            confirmButtonColor: '#0d6efd',
+
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href = "signInPage.html"
+            }
+          })
+        }
+      });
+    }
+    window.loadingg = loadingg
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+
+</html>
